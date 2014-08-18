@@ -1,0 +1,63 @@
+首先建立一个工程，然后添加如下的jar包：commons-codec-1.6.jar，commons-logging-1.1.1.jar，httpclient-4.2.5.jar，httpcore-4.2.4.jar，
+下载地址是：http://hc.apache.org/downloads.cgi。
+实现代码如下：
+package html;
+
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.*;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+public class SpiderHttpClient {
+
+    public static void main(String[] args) throws Exception {
+        // TODO Auto-generated method stub
+        String url_str = "http://www.lagou.com";
+        String charset = "utf-8";
+        String filepath = "d:/lagou.html";
+        
+        HttpClient hc = new DefaultHttpClient();
+        HttpGet hg = new HttpGet(url_str);
+        HttpResponse response = hc.execute(hg);
+        HttpEntity entity = response.getEntity();
+        
+        
+        InputStream htm_in = null;
+        
+        if(entity != null){
+            System.out.println(entity.getContentLength());
+            htm_in = entity.getContent();
+            String htm_str = InputStream2String(htm_in,charset);
+            saveHtml(filepath,htm_str);
+        }
+    }
+    public static void saveHtml(String filepath, String str){
+        
+        try {
+            OutputStreamWriter outs = new OutputStreamWriter(new FileOutputStream(filepath, true), "utf-8");
+            outs.write(str);
+            outs.close();
+        } catch (IOException e) {
+            System.out.println("Error at save html...");
+            e.printStackTrace();
+        }
+    }
+    public static String InputStream2String(InputStream in_st,String charset) throws IOException{
+        BufferedReader buff = new BufferedReader(new InputStreamReader(in_st, charset));
+        StringBuffer res = new StringBuffer();
+        String line = "";
+        while((line = buff.readLine()) != null){
+            res.append(line);
+        }
+        return res.toString();
+    }
+}
+这样就可以实现爬下一个网页了，很简单，自己可以试试，也可以添加功能。
